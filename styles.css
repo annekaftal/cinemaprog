@@ -1,0 +1,18 @@
+.match{
+    height: 50px;
+    margin: 5px; 
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.thumbnailImage{
+    height: 50px;
+    width: 50px;
+    background-size: cover;
+    background-position: center;
+}
+
+.thumbnailTitle{
+    margin-left: 5px;
+}
