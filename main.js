@@ -7,38 +7,27 @@ const options = {
     }
 };
 
-// recherche dans l'API à partir d'un input
-let input = document.querySelector('input')
-let matches = document.querySelector('#movieMatches');
-input.addEventListener('keyup', async () => {
+// ralentissement de l'affichage
+function debounce (f, ms) {
+    let timeout;
+    return function () {
+        if (timeout){
+            clearTimeout(timeout);
+        };
+        timeout = setTimeout(() => {
+            f();
+        }, ms);
+    }
+}
+
+// affichage dynamique des résultats (avec récupération des informations à utiliser)
+const displayMatches = async () => {
     console.log(`input = ${input.value}`);
     const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${input.value}&include_adult=false&language=en-US&page=1`, options);
     const data = await response.json();
     console.log(data);
 
-// version pour accéder à toutes les pages: 
-//     let data = {};
-//     data['results'] = [];
-//     for (let i = 1; i <= 500; i++){
-//         let response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${input.value}&include_adult=false&language=en-US&page=${i}`, options);
-//         let singlePageData = await response.json();
-//         if (singlePageData.results.length === 0){
-//             break;
-//         } 
-//         else {
-//             for (let i = 0; i < singlePageData.results.length; i++){    
-//                 if (singlePageData.results[i] === 0){
-//                     break;
-//                 }
-//                 else {
-//                     data['results'].push(singlePageData.results[i]);
-//                 };
-//             };
-//             console.log(data);
-//         };
-//     };
 
-        // affichage dynamique des résultats (avec récupération des informations à utiliser)
     if (matches.innerHTML != null) {
         matches.innerHTML = null;
     };
@@ -58,7 +47,7 @@ input.addEventListener('keyup', async () => {
 
         let movieMatch = document.createElement('div');
         movieMatch.classList.add('match');
-        movieMatch.setAttribute('id', `movie${movieId}`)  
+        movieMatch.setAttribute('id', `${movieId}`)  
         
         let matchTitle = document.createElement('p');
         matchTitle.classList.add('thumbnailTitle');
@@ -77,7 +66,37 @@ input.addEventListener('keyup', async () => {
         
         movieMatch.appendChild(matchImg);
         movieMatch.appendChild(matchTitle);
-        matches.appendChild(movieMatch); 
+        matches.appendChild(movieMatch);  
+        
+        const preview = document.querySelector('#imgPreview');
+        movieMatch.addEventListener('click', async () => {
+            let selectedId = movieMatch.getAttribute('id');
+            console.log(`ID = ${selectedId}`);
+            matches.innerHTML = null;
+
+            if (preview.innerHTML != null){
+                preview.innerHTML = null;
+            }
+            
+            const imgResponse = await fetch (`https://api.themoviedb.org/3/movie/${selectedId}/images`, options);
+            const imgData = await imgResponse.json();
+
+            for (let i = 0; i < imgData.backdrops.length; i++){
+                let backdropPreview = document.createElement('img')
+                backdropPreview.classList.add('previewImage');
+                backdropPreview.setAttribute('style', `background-image: url('https://image.tmdb.org/t/p/original${imgData.backdrops[i].file_path}')`);
+                preview.appendChild(backdropPreview);
+            }
+
+            
+
+        })
 
     };
-});
+};
+
+
+// recherche dans l'API à partir d'un input
+let input = document.querySelector('input')
+let matches = document.querySelector('#movieMatches');
+input.addEventListener('keyup', debounce(displayMatches, 300));

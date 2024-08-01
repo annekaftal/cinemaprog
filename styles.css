@@ -1,18 +1,63 @@
+#collageMaker{
+    height: 97vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+#collage{
+    border: solid black 1px;
+}
+
+#controls{
+    border: solid black 1px;
+}
+
+#searchbar{
+    height:50px;
+    width: 100%;
+    outline-style: none;
+}
+
+#searchbar:focus{
+    background-color: aliceblue;
+}
+
+
 .match{
-    height: 50px;
-    margin: 5px; 
+    height: 150px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    background-color: aliceblue;
+}
+
+.match:hover{
+    cursor: pointer;
+    background-color: rgb(218, 234, 249);
 }
 
 .thumbnailImage{
-    height: 50px;
-    width: 50px;
+    height: 150px;
+    width: 250px;
     background-size: cover;
     background-position: center;
 }
 
 .thumbnailTitle{
     margin-left: 5px;
+}
+
+#imgPreview{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.previewImage{
+    max-height: 160px;
+    min-height: 160px;
+    max-width: 250px;
+    min-width: 250px;
+    background-size: cover;
+    background-position: center;
 }
