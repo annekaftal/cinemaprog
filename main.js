@@ -10,13 +10,10 @@ const options = {
 // recherche dans l'API à partir d'un input
 let input = document.querySelector('input')
 let matches = document.querySelector('#movieMatches');
-input.addEventListener('input', async () => {
-    let input = document.querySelector('input')
-    let matches = document.querySelector('#movieMatches');
-    input.addEventListener('input', async () => {
-        console.log(`input = ${input.value}`);
-        const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${input.value}&include_adult=false&language=en-US&page=1`, options);
-        const data = await response.json();
+input.addEventListener('search', async () => {
+    console.log(`input = ${input.value}`);
+    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${input.value}&include_adult=false&language=en-US&page=1`, options);
+    const data = await response.json();
 
 // version pour accéder à toutes les pages: 
 //     let data = {};
@@ -41,43 +38,49 @@ input.addEventListener('input', async () => {
 //     };
 
         // affichage dynamique des résultats (avec récupération des informations à utiliser)
-        if (matches.innerHTML != null) {
-            matches.innerHTML = null;
+    if (matches.innerHTML != null) {
+        matches.innerHTML = null;
+    };
+    for (let i = 0; i < data.results.length; i++){
+        console.log(i)
+        let movieId = data.results[i].id;
+        let releaseYear = data.results[i].release_date.split('-')[0];
+            
+        // récupération de la première image de chaque film (à peut-être déplacer en dehors de la boucle ?)
+        let imageResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/images`, options);
+        let imageData = await imageResponse.json();
+        console.log(imageData)
+        let backdrop;
+        if (imageData.posters.length > 0){
+            backdrop = imageData.posters[0].file_path;
+        }
+        else {
+            break;
         };
-        for (let i = 0; i < data.results.length; i++){
-
-            let movieId = data.results[i].id;
-            let releaseYear = data.results[i].release_date.split('-')[0];
-            
-            // récupération de la première image de chaque film (à peut-être déplacer en dehors de la boucle ?)
-            // let imageResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/images`, options);
-            // let imageData = await imageResponse.json();
-            // let backdrop;
-            // if (imageData.backdrops.length === 0){
-            //     break;
-            // }
-            // else if (imageData.backdrops.length > 0){
-            //     backdrop = imageData.backdrops[0].file_path;
-            // };
 
 
-            let movieMatch = document.createElement('div');
-            movieMatch.classList.add('match');
-            movieMatch.setAttribute('id', `movie${movieId}`)  
-            
-            let matchTitle = document.createElement('p');
-            matchTitle.classList.add('thumbnailTitle')
-            matchTitle.innerHTML = `${data.results[i].title}, ${releaseYear}<br/>`;
+        let movieMatch = document.createElement('div');
+        movieMatch.classList.add('match');
+        movieMatch.setAttribute('id', `movie${movieId}`)  
+        
+        let matchTitle = document.createElement('p');
+        matchTitle.classList.add('thumbnailTitle');
+        if (!data.results[i].release_date){
+            matchTitle.innerHTML = `${data.results[i].title}`;
+        }
+        else {
+            matchTitle.innerHTML = `${data.results[i].title} - ${releaseYear}<br/>`;
+        }; 
+        
 
-            let matchImg = document.createElement('img');
-            matchImg.classList.add('thumbnailImage')
-            matchImg.setAttribute('style', 'background-image: url("https://image.tmdb.org/t/p/original/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg")')
+        let matchImg = document.createElement('img');
+        matchImg.classList.add('thumbnailImage')
+        matchImg.setAttribute('style', `background-image: url('https://image.tmdb.org/t/p/original${backdrop})`)
 
-            
-            movieMatch.appendChild(matchImg);
-            movieMatch.appendChild(matchTitle);
-            matches.appendChild(movieMatch); 
+        
+        movieMatch.appendChild(matchImg);
+        movieMatch.appendChild(matchTitle);
+        matches.appendChild(movieMatch); 
 
-        };
-    });
+    };
 });
