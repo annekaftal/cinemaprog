@@ -10,10 +10,11 @@ const options = {
 // recherche dans l'API à partir d'un input
 let input = document.querySelector('input')
 let matches = document.querySelector('#movieMatches');
-input.addEventListener('search', async () => {
+input.addEventListener('keyup', async () => {
     console.log(`input = ${input.value}`);
     const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${input.value}&include_adult=false&language=en-US&page=1`, options);
     const data = await response.json();
+    console.log(data);
 
 // version pour accéder à toutes les pages: 
 //     let data = {};
@@ -45,17 +46,13 @@ input.addEventListener('search', async () => {
         console.log(i)
         let movieId = data.results[i].id;
         let releaseYear = data.results[i].release_date.split('-')[0];
-            
-        // récupération de la première image de chaque film (à peut-être déplacer en dehors de la boucle ?)
-        let imageResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/images`, options);
-        let imageData = await imageResponse.json();
-        console.log(imageData)
+        
         let backdrop;
-        if (imageData.posters.length > 0){
-            backdrop = imageData.posters[0].file_path;
+        if (data.results[i].poster_path){
+            backdrop = `https://image.tmdb.org/t/p/original${data.results[i].poster_path}`;
         }
         else {
-            break;
+            backdrop = 'https://critics.io/img/movies/poster-placeholder.png';
         };
 
 
@@ -74,8 +71,8 @@ input.addEventListener('search', async () => {
         
 
         let matchImg = document.createElement('img');
-        matchImg.classList.add('thumbnailImage')
-        matchImg.setAttribute('style', `background-image: url('https://image.tmdb.org/t/p/original${backdrop})`)
+        matchImg.classList.add('thumbnailImage');
+        matchImg.setAttribute('style', `background-image: url(${backdrop})`);
 
         
         movieMatch.appendChild(matchImg);
